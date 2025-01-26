@@ -26,7 +26,11 @@
         </div>
       </form>
 
-      <ul>
+      <div v-if="isFetching" class="fetching-spinner">
+        <div class="spinner"></div>
+      </div>
+
+      <ul v-if="!isFetching">
         <TaskItem
             v-for="task in sortedTasks"
             :key="task.id"
@@ -51,6 +55,7 @@ export default {
     return {
       newTask: { name: '', status: 'Not started' },
       isLoading: false,
+      isFetching: false,
     };
   },
   computed: {
@@ -78,9 +83,21 @@ export default {
       await tasksStore.deleteTask(id);
       this.isLoading = false;
     },
+    async fetchTasks() {
+      if (!sessionStorage.getItem('tasksFetched')) {
+        this.isFetching = true;
+        const tasksStore = useTasksStore();
+        await tasksStore.fetchTasks();
+        sessionStorage.setItem('tasksFetched', 'true');
+        this.isFetching = false;
+      }
+    },
     editTask(id) {
       this.$router.push(`/edit/${id}`);
     },
+  },
+  mounted() {
+    this.fetchTasks();
   },
 };
 </script>
@@ -200,6 +217,12 @@ button:disabled {
   width: 24px;
   height: 24px;
   animation: spin 1s linear infinite;
+}
+
+.fetching-spinner {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
 }
 
 @keyframes spin {

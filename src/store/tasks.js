@@ -6,9 +6,7 @@ export const useTasksStore = defineStore('tasks', {
     }),
     actions: {
         async fetchTasks() {
-            // Simulating a 1-second delay
             await new Promise(resolve => setTimeout(resolve, 1000));
-            // In a real app, you would fetch data from an API
             this.tasks = JSON.parse(localStorage.getItem('tasks')) || [];
         },
         async addTask(task) {
